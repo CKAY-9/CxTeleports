@@ -8,6 +8,29 @@ util.AddNetworkString("openCxTeleports")
 util.AddNetworkString("openAdmin")
 util.AddNetworkString("createNewLocation")
 util.AddNetworkString("teleportPlayer")
+util.AddNetworkString("closeTeleports")
+util.AddNetworkString("deleteTeleport")
+
+net.Receive("deleteTeleport", function()
+    local key = net.ReadString()
+    local ply = net.ReadEntity()
+
+    if (CXTP.Teleports[key] == nil) then
+        return
+    end
+    if (not ply:IsAdmin()) then
+        print("[CXTeleports] " .. ply:GetName() .. " attemped to delete location without admin permissions!")
+        return
+    end
+
+    CXTP.Teleports[key] = nil
+    net.Start("openAdmin")
+    if (CXTP.Teleports == nil) then
+        CXTP.Teleports = {}
+    end
+    net.WriteTable(CXTP.Teleports)
+    net.Send(ply)
+end)
 
 net.Receive("createNewLocation", function()
     local ply = net.ReadEntity()
@@ -55,6 +78,9 @@ net.Receive("teleportPlayer", function()
     ply:Freeze(true)
     ply:addMoney(-tp["cost"])
 
+    net.Start("closeTeleports")
+    net.Send(ply)
+
     hook.Add("Think", "CxTP.TrackPlayerParticle", function()
         ParticleEffect("vortigaunt_charge_token_b", ply:GetBonePosition(ply:LookupBone("ValveBiped.Bip01_Spine")), Angle( 0, 0, 0 ), ply)
     end)
@@ -73,7 +99,10 @@ end)
 
 net.Receive("openAdmin", function()
     local ply = net.ReadEntity()
-    if (not ply:IsAdmin()) then return end
+    if (not ply:IsAdmin()) then
+        print("[CXTeleports] " .. ply:GetName() .. " attemped to open admin panel without admin permissions!")
+        return
+    end
 
     net.Start("openAdmin")
     if (CXTP.Teleports == nil) then

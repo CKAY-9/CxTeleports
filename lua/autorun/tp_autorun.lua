@@ -5,11 +5,10 @@ if SERVER then
     AddCSLuaFile("cl_teleport.lua")
     AddCSLuaFile("tp_config.lua")
 
-    resource.AddFile("resources/fonts/OpenSans-ExtraBold.ttf")
-    resource.AddFile("resources/fonts/OpenSans-Regular.ttf")
-    resource.AddFile("resources/fonts/OpenSans-SemiBold.ttf")
-
     print("[CXTeleports] Started CxTeleport")
+    resource.AddFile("resource/fonts/Inter-Regular.ttf")
+    resource.AddFile("resource/fonts/Inter-Bold.ttf")
+    resource.AddFile("resource/fonts/Inter-Black.ttf")
 else
     include("tp_config.lua")
     include("cl_teleport.lua")

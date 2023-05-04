@@ -6,28 +6,28 @@ local pw, ph = scrw * 0.35, scrh * 0.65
 local transparent = Color(0, 0, 0, 0)
 
 surface.CreateFont("CxTP.Small", {
-    font = "Open Sans Regular",
+    font = "Inter Regular",
     extended = false,
     size = ScrW() * 0.008,
     antialias = true
 })
 
 surface.CreateFont("CxTP.Regular", {
-    font = "Open Sans Regular",
+    font = "Inter Regular",
     extended = false,
     size = ScrW() * 0.014,
     antialias = true
 })
 
 surface.CreateFont("CxTP.Med", {
-    font = "Open Sans SemiBold",
+    font = "Inter Bold",
     extended = false,
     size = ScrW() * 0.014,
     antialias = true
 })
 
 surface.CreateFont("CxTP.Bold", {
-    font = "Open Sans ExtraBold",
+    font = "Inter Black",
     extended = false,
     size = ScrW() * 0.014,
     antialias = true
@@ -106,7 +106,7 @@ CXTP.OpenAdmin = function()
         CXTP.NoTPs = vgui.Create("DPanel", CXTP.Menu)
         CXTP.NoTPs:SetSize(pw * 0.7, ph * 0.1)
         CXTP.NoTPs:Dock(TOP)
-        CXTP.NoTPs:DockMargin(pw * 0.15, 0, pw * 0.15, 10)
+        CXTP.NoTPs:DockMargin(pw * 0.15, 10, pw * 0.15, 10)
 
         CXTP.NoTPs.Paint = function(self, w, h)
             draw.SimpleText("There are no TP locations set!", "CxTP.Med", w * 0.5, h * 0.5, CXTP.Theme.text, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
@@ -119,7 +119,7 @@ CXTP.OpenAdmin = function()
 
         CXTP.ExistingLocationsLabel.Paint = function(self, w, h)
             draw.RoundedBox(0, 0, 0, 0, 0, transparent)
-            draw.SimpleText("Existing Teleport Locations (click to delete)", "CxTP.Bold", w * 0.5, h * 0.5, CXTP.Theme.text, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+            draw.SimpleText("Click to delete teleport", "CxTP.Bold", w * 0.5, h * 0.5, CXTP.Theme.text, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
         end
 
         CXTP.TeleportsList = vgui.Create("DScrollPanel", CXTP.Menu)
@@ -145,6 +145,15 @@ CXTP.OpenAdmin = function()
                 if (ply:isArrested() == nil and v["cost"] > 0) then
                     draw.SimpleText("Cost: $" .. v["cost"], "CxTP.Regular", w * 0.5, h * 0.75, CXTP.Theme.text, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
                 end
+            end
+
+            TPLocation.DoClick = function()
+                if (not ply:IsAdmin()) then return end
+
+                net.Start("deleteTeleport")
+                net.WriteString(k)
+                net.WriteEntity(ply)
+                net.SendToServer()
             end
         end
     end
@@ -225,7 +234,6 @@ CXTP.OpenAdmin = function()
 
     CXTP.CoordsAutoGet = vgui.Create("DButton", CXTP.CoordsPanel)
     CXTP.CoordsAutoGet:SetText("Get Current")
-    CXTP.CoordsAutoGet:SetFont("CxTP.Small")
     CXTP.CoordsAutoGet:Dock(LEFT)
     CXTP.CoordsAutoGet:DockMargin(10, 5, 10, 5)
 
@@ -367,7 +375,7 @@ CXTP.OpenTPs = function()
 
         CXTP.OpenAdmin.Paint = function(self, w, h)
             draw.RoundedBox(0, 0, 0, w, h, CXTP.Theme.accent)
-            draw.SimpleText("Admin", "Bold", w * 0.5, h * 0.5, CXTP.Theme.text, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+            draw.SimpleText("Admin", "CxTP.Bold", w * 0.5, h * 0.5, CXTP.Theme.text, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
         end
 
         CXTP.OpenAdmin.DoClick = function()
@@ -375,15 +383,6 @@ CXTP.OpenTPs = function()
             net.WriteEntity(ply)
             net.SendToServer()
         end
-    end
-
-    CXTP.Title = vgui.Create("DPanel", CXTP.Menu)
-    CXTP.Title:SetSize(pw * 0.7, ph * 0.05)
-    CXTP.Title:Dock(TOP)
-    CXTP.Title:DockMargin(pw * 0.15, ph * 0.05, pw * 0.15, 10)
-
-    CXTP.Title.Paint = function(self, w, h)
-        draw.SimpleText("Teleport Locations", "CxTP.Bold", w * 0.5, h * 0.5, CXTP.Theme.text, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
     end
 
     if (table.Count(tps) <= 0) then
@@ -396,6 +395,15 @@ CXTP.OpenTPs = function()
             draw.SimpleText("There are no TP locations set!", "CxTP.Med", w * 0.5, h * 0.5, CXTP.Theme.text, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
         end
     else
+        CXTP.Title = vgui.Create("DPanel", CXTP.Menu)
+        CXTP.Title:SetSize(pw * 0.7, ph * 0.05)
+        CXTP.Title:Dock(TOP)
+        CXTP.Title:DockMargin(pw * 0.15, ph * 0.05, pw * 0.15, 10)
+
+        CXTP.Title.Paint = function(self, w, h)
+            draw.SimpleText("Teleport Locations", "CxTP.Bold", w * 0.5, h * 0.5, CXTP.Theme.text, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+        end
+
         CXTP.TeleportsList = vgui.Create("DScrollPanel", CXTP.Menu)
         CXTP.TeleportsList:Dock(FILL)
         CXTP.TeleportsList:DockMargin(pw * 0.15, 10, pw * 0.15, 10)
@@ -439,3 +447,8 @@ end
 
 net.Receive("openCxTeleports", CXTP.OpenTPs)
 net.Receive("openAdmin", CXTP.OpenAdmin)
+net.Receive("closeTeleports", function()
+    if (IsValid(CXTP.Menu)) then
+        CXTP.Menu:Remove()
+    end
+end)
