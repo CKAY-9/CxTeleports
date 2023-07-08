@@ -142,7 +142,7 @@ CXTP.OpenAdmin = function()
                 draw.RoundedBox(10, 0, 0, w, h, CXTP.Theme.accent)
                 draw.SimpleText(v["name"], "CxTP.Regular", w * 0.5, h * 0.25, CXTP.Theme.text, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
                 draw.SimpleText(v["desc"], "CxTP.Regular", w * 0.5, h * 0.50, CXTP.Theme.text, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-                if (ply:isArrested() == nil and v["cost"] > 0) then
+                if (ply.isArrested ~= nil and v["cost"] > 0) then
                     draw.SimpleText("Cost: $" .. v["cost"], "CxTP.Regular", w * 0.5, h * 0.75, CXTP.Theme.text, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
                 end
             end
@@ -274,7 +274,7 @@ CXTP.OpenAdmin = function()
 
     -- DarkRP implementation
     CXTP.MoneyAmount = 0
-    if (ply:isArrested() == nil) then
+    if (ply.isArrested ~= nil) then
         CXTP.MoneyAmountLabel = vgui.Create("DLabel", CXTP.NewLocationCreation)
         CXTP.MoneyAmountLabel:SetText("DarkRP Cost")
         CXTP.MoneyAmountLabel:SetFont("CxTP.Small")
@@ -423,13 +423,13 @@ CXTP.OpenTPs = function()
                 draw.RoundedBox(10, 0, 0, w, h, CXTP.Theme.accent)
                 draw.SimpleText(v["name"], "CxTP.Regular", w * 0.5, h * 0.25, CXTP.Theme.text, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
                 draw.SimpleText(v["desc"], "CxTP.Regular", w * 0.5, h * 0.50, CXTP.Theme.text, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-                if (ply:isArrested() == nil and v["cost"] > 0) then
+                if (ply.isArrested ~= nil and v["cost"] > 0) then
                     draw.SimpleText("Cost: $" .. v["cost"], "CxTP.Regular", w * 0.5, h * 0.75, CXTP.Theme.text, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
                 end
             end
 
             TPLocation.DoClick = function()
-                if (ply:isArrested() == nil and ply:getDarkRPVar("money") < v["cost"]) then
+                if (ply.isArrested ~= nil and ply:getDarkRPVar("money") < v["cost"]) then
                     notification.AddLegacy("You can't afford this teleport!", NOTIFY_ERROR, 1)
                     surface.PlaySound( "buttons/button10.wav" )
                     return

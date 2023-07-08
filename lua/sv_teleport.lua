@@ -71,12 +71,14 @@ net.Receive("teleportPlayer", function()
 
     local tp = CXTP.Teleports[key]
 
-    if (ply:getDarkRPVar("money") < tp["cost"]) then
+    if (ply.isArrested ~= nil and ply:getDarkRPVar("money") < tp["cost"]) then
         return
+    end
+    if (ply.isArrested ~= nil and ply:getDarkRPVar("money") > tp["cost"]) then 
+        ply:addMoney(-tp["cost"])
     end
 
     ply:Freeze(true)
-    ply:addMoney(-tp["cost"])
 
     net.Start("closeTeleports")
     net.Send(ply)
